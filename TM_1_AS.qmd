@@ -1,0 +1,193 @@
+---
+title: "TM_1_AS"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+library(tidyverse)
+library(ComplexUpset)
+library(ggplot2)
+```
+
+```{r}
+Gh_as <- read.table("Ghir_event.psi", check.names = F) 
+```
+
+```{r}
+modified_colnames <- gsub("^[^_]*_(.*)_[^_]*$", "\\1", colnames(Gh_as))
+```
+
+```{r}
+colnames(Gh_as) <- modified_colnames
+```
+
+```{r}
+Gh_as <- Gh_as %>% rownames_to_column(var = "ID")
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('ovule_-3dpa' = `ovule_-3dpa-1` > 0 & `ovule_-3dpa-2` > 0 & `ovule_-3dpa-3` > 0)
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('ovule_-1dpa' = `ovule_-1dpa-1` > 0 & `ovule_-1dpa-2` > 0 & `ovule_-1dpa-3` > 0)
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('ovule_0dpa' = `ovule_0dpa-1` > 0 & `ovule_0dpa-2` > 0 & `ovule_0dpa-3` > 0)
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('ovule_1dpa' = `ovule_1dpa-1` > 0 & `ovule_1dpa-2` > 0 & `ovule_1dpa-3` > 0)
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('ovule_3dpa' = `ovule_3dpa-1` > 0 & `ovule_3dpa-2` > 0 & `ovule_3dpa-3` > 0)
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('ovule_5dpa' = `ovule_5dpa-1` > 0 & `ovule_5dpa-2` > 0 & `ovule_5dpa-3` > 0)
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('fiber_10dpa' = `fiber_10dpa-1` > 0 & `fiber_10dpa-2` > 0 & `fiber_10dpa-3` > 0)
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('fiber_15dpa' = `fiber_15dpa-1` > 0 & `fiber_15dpa-2` > 0 & `fiber_15dpa-3` > 0)
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('fiber_20dpa' = `fiber_20dpa-1` > 0 & `fiber_20dpa-2` > 0 & `fiber_20dpa-3` > 0)
+```
+
+```{r}
+Gh_as <- Gh_as %>%
+  mutate('fiber_25dpa' = `fiber_25dpa-1` > 0 & `fiber_25dpa-2` > 0 & `fiber_25dpa-3` > 0)
+```
+
+```{r}
+Ghasus <- Gh_as[ , c(1,32:41)]
+```
+
+```{r}
+Ghasus <- na.omit(Ghasus)
+```
+
+#修改列名
+
+```{r}
+colnames(Ghasus)[colnames(Ghasus) == "ovule_-3dpa"] <- "Ovule_3dpa"
+colnames(Ghasus)[colnames(Ghasus) == "ovule_-1dpa"] <- "Ovule_1dpa"
+colnames(Ghasus)[colnames(Ghasus) == "ovule_0dpa"] <- "Ovule0dpa"
+colnames(Ghasus)[colnames(Ghasus) == "ovule_1dpa"] <- "Ovule1dpa"
+colnames(Ghasus)[colnames(Ghasus) == "ovule_3dpa"] <- "Ovule3dpa"
+colnames(Ghasus)[colnames(Ghasus) == "ovule_5dpa"] <- "Ovule5dpa"
+colnames(Ghasus)[colnames(Ghasus) == "fiber_10dpa"] <- "Fiber10dpa"
+colnames(Ghasus)[colnames(Ghasus) == "fiber_15dpa"] <- "Fiber15dpa"
+colnames(Ghasus)[colnames(Ghasus) == "fiber_20dpa"] <- "Fiber20dpa"
+colnames(Ghasus)[colnames(Ghasus) == "fiber_25dpa"] <- "Fiber25dpa"
+```
+
+```{r}
+species <- colnames(Ghasus)[2:11]
+```
+
+```{r}
+RIGhasus <- Ghasus[grep("RI", Ghasus[,1]), ]
+```
+
+```{r}
+MXGhasus <- Ghasus[grep("MX", Ghasus[,1]), ] 
+```
+
+```{r}
+SEGhasus <- Ghasus[grep("SE", Ghasus[,1]), ] 
+```
+
+```{r}
+AFGhasus <- Ghasus[grep("AF", Ghasus[,1]), ] 
+```
+
+```{r}
+ALGhasus <- Ghasus[grep("AL", Ghasus[,1]), ] 
+```
+
+```{r}
+A5Ghasus <- Ghasus[grep("A5", Ghasus[,1]), ]
+```
+
+```{r}
+A3Ghasus <- Ghasus[grep("A3", Ghasus[,1]), ]
+```
+
+#绘制内含子保留的Upsetplot图
+
+```{r}
+pdf("GhRIupset.pdf", width = 24, height = 10)
+upset(RIGhasus,
+      species,
+      name = "RI",
+      width_ratio = 0.15,
+      min_size = 30,
+      sort_sets = FALSE,
+      sort_intersections_by = "degree",
+      base_annotations = list("Intersection size" = intersection_size(counts = FALSE, mapping = aes(fill = "bars_colour")) + scale_fill_manual(values = c(bars_colour = "#0a86ff"), guide = "none")),
+      queries = list(
+        upset_query(set = "Ovule_3dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule_1dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule0dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule1dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule3dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule5dpa", fill = "#6bb6ff"),
+        upset_query(set = "Fiber10dpa", fill = "#1e90ff"),
+        upset_query(set = "Fiber15dpa", fill = "#1e90ff"),
+        upset_query(set = "Fiber20dpa", fill = "#006ad1"),
+        upset_query(set = "Fiber25dpa", fill = "#006ad1"),
+        upset_query(intersect = c("Fiber15dpa", "Fiber20dpa", "Fiber25dpa"), color = "#ff6b6c")
+      ))
+dev.off()
+```
+
+```{r}
+pdf("GhRIupset.pdf", width = 24, height = 8)
+upset(RIGhasus,
+      species,
+      name = "RI",
+      width_ratio = 0.1,
+      min_size = 50,
+      sort_sets=FALSE,
+      sort_intersections_by="degree",
+      base_annotations = list("Intersection size" = intersection_size(counts = FALSE, mapping = aes(fill = "bars_colour")) + scale_fill_manual(values = c(bars_colour = "#ea7300"), guide = "none")),
+      queries = list(
+        upset_query(set = "Ovule_3dpa", fill = "#ffb46b"),
+        upset_query(set = "Ovule_1dpa", fill = "#ffb46b"),
+        upset_query(set = "Ovule0dpa", fill = "#ffb46b"),
+        upset_query(set = "Ovule1dpa", fill = "#ffb46b"),
+        upset_query(set = "Ovule3dpa", fill = "#ffb46b"),
+        upset_query(set = "Ovule5dpa", fill = "#ffb46b"),
+        upset_query(set = "Fiber10dpa", fill = "#ff8d1e"),
+        upset_query(set = "Fiber15dpa", fill = "#ff8d1e"),
+        upset_query(set = "Fiber20dpa", fill = "#d16700"),
+        upset_query(set = "Fiber25dpa", fill = "#d16700")
+      ))
+dev.off()  
+```
