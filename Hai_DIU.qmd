@@ -1,0 +1,237 @@
+---
+title: "DIU"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+```{r}
+library(rats)
+#library(IsoformSwitchAnalyzeR)
+library(tidyverse)
+library(data.table)
+```
+
+```{r}
+Gbar_iso_tpm <- read.table("Gbar_isoform.tpm", header = T, check.names = F) %>%
+  rownames_to_column(var = "Isoform id") 
+```
+
+```{r}
+#过滤所有行，使得所有列的值至少有一个大于或等于1
+#Gbar_iso_tpm <- Gbar_iso_tpm %>% 
+#  filter(rowSums(.[, -1] >= 1) > 0)
+```
+
+```{r}
+Gbid <- read.table("hai_iso_gene_id", col.names = c("target id", "parent id"))
+```
+
+```{r}
+GbGTF <- gtf2ids("Gb_Inclufib_name.gtf")
+```
+
+```{r}
+#GbGTF <- GbGTF %>% 
+#  filter(`target_id` %in% Gbar_iso_tpm$`Isoform id`)
+```
+
+```{r}
+ovule_3dpa <- data.table(Gbar_iso_tpm[, c("Isoform id", "3-79_ovule_-3dpa-1_L1", "3-79_ovule_-3dpa-2_L1", "3-79_ovule_-3dpa-3_L1")])
+ovule_1dpa <- data.table(Gbar_iso_tpm[, c("Isoform id", "3-79_ovule_-1dpa-1_L1", "3-79_ovule_-1dpa-2_L1", "3-79_ovule_-1dpa-3_L1")])
+ovule0dpa <- data.table(Gbar_iso_tpm[, c("Isoform id", "3-79_ovule_0dpa-1_L1", "3-79_ovule_0dpa-2_L1", "3-79_ovule_0dpa-3_L1")])
+ovule1dpa <- data.table(Gbar_iso_tpm[, c("Isoform id", "3-79_ovule_1dpa-1_L1", "3-79_ovule_1dpa-2_L1", "3-79_ovule_1dpa-3_L1")])
+ovule3dpa <- data.table(Gbar_iso_tpm[, c("Isoform id", "3-79_ovule_3dpa-1_L1", "3-79_ovule_3dpa-2_L1", "3-79_ovule_3dpa-3_L1")])
+ovule5dpa <- data.table(Gbar_iso_tpm[, c("Isoform id", "3-79_ovule_5dpa-1_L1", "3-79_ovule_5dpa-2_L1","3-79_ovule_5dpa-3_L1")])
+fiber10dpa <- data.table(Gbar_iso_tpm[, 1:4]) 
+fiber15dpa <- data.table(Gbar_iso_tpm[, c("Isoform id", "3-79_fiber_15dpa-1_L1", "3-79_fiber_15dpa-2_L1", "3-79_fiber_15dpa-3_L1")])
+fiber20dpa <- data.table(Gbar_iso_tpm[, c("Isoform id", "3-79_fiber_20dpa-1_L2", "3-79_fiber_20dpa-2_L2", "3-79_fiber_20dpa-3_L1")])
+fiber25dpa <- data.table(Gbar_iso_tpm[, c("Isoform id", "3-79_fiber_25dpa-1_L3", "3-79_fiber_25dpa-2_L2", "3-79_fiber_25dpa-3_L1")])
+
+```
+
+```{r}
+diu_1dpavs_3dpa <- call_DTU(annot = GbGTF,
+                count_data_A = ovule_3dpa,
+                count_data_B = ovule_1dpa,
+                name_A = "ovule_3dpa",
+                name_B = "ovule_1dpa",
+                scaling = 1,
+                verbose = FALSE,
+                description = "Ovule_1VS_3DPA",
+                dprop_thresh = 0.2)
+```
+
+```{r}
+diu0dpavs_1dpa <- call_DTU(annot = GbGTF,
+                count_data_A = ovule_1dpa,
+                count_data_B = ovule0dpa,
+                name_A = "ovule_1dpa",
+                name_B = "ovule0dpa",
+                scaling = 1,
+                verbose = FALSE,
+                description = "Ovule0VS_1DPA",
+                dprop_thresh = 0.2)
+```
+
+```{r}
+diu1dpavs0dpa <- call_DTU(annot = GbGTF,
+                count_data_A = ovule0dpa,
+                count_data_B = ovule3dpa,
+                name_A = "ovule0dpa",
+                name_B = "ovule1dpa",
+                scaling = 1,
+                verbose = FALSE,
+                description = "Ovule1VS0DPA",
+                dprop_thresh = 0.2)
+```
+
+```{r}
+diu3dpavs1dpa <- call_DTU(annot = GbGTF,
+                count_data_A = ovule1dpa,
+                count_data_B = ovule3dpa,
+                name_A = "ovule1dpa",
+                name_B = "ovule3dpa",
+                scaling = 1,
+                verbose = FALSE,
+                description = "Ovule3VS1DPA",
+                dprop_thresh = 0.2)
+```
+
+```{r}
+diu5dpavs3dpa <- call_DTU(annot = GbGTF,
+                count_data_A = ovule3dpa,
+                count_data_B = ovule5dpa,
+                name_A = "ovule3dpa",
+                name_B = "ovule5dpa",
+                scaling = 1,
+                verbose = FALSE,
+                description = "Ovule5VS3DPA",
+                dprop_thresh = 0.2)
+```
+
+```{r}
+diu10dpavs5dpa <- call_DTU(annot = GbGTF,
+                count_data_A = ovule5dpa,
+                count_data_B = fiber10dpa,
+                name_A = "ovule5dpa",
+                name_B = "fiber10dpa",
+                scaling = 1,
+                verbose = FALSE,
+                description = "Fiber10VS5DPA",
+                dprop_thresh = 0.2)
+```
+
+```{r}
+diu15dpavs10dpa <- call_DTU(annot = GbGTF,
+                count_data_A = fiber10dpa,
+                count_data_B = fiber15dpa,
+                name_A = "Fiber10DPA",
+                name_B = "fiber15dpa",
+                scaling = 1,
+                verbose = FALSE,
+                description = "Fiber10VS15DPA",
+                dprop_thresh = 0.2)
+```
+
+```{r}
+diu20dpavs15dpa <- call_DTU(annot = GbGTF,
+                count_data_A = fiber15dpa,
+                count_data_B = fiber20dpa,
+                name_A = "fiber15dpa",
+                name_B = "fiber20dpa",
+                scaling = 1,
+                verbose = FALSE,
+                description = "Fiber20VS15DPA",
+                dprop_thresh = 0.2)
+```
+
+```{r}
+diu25dpavs20dpa <- call_DTU(annot = GbGTF,
+                count_data_A = fiber20dpa,
+                count_data_B = fiber25dpa,
+                name_A = "fiber20dpa",
+                name_B = "fiber25dpa",
+                scaling = 1,
+                verbose = FALSE,
+                description = "Fiber25VS20DPA",
+                dprop_thresh = 0.2)
+```
+
+```{r}
+library(readxl)
+sum_DIU <- read_excel("sum_DIU.xlsx")
+```
+
+```{r}
+#展示
+sum_DIU$ID <- as.factor(seq_along(sum_DIU$Stage))
+sum_DIU$Stage <- factor(sum_DIU$Stage, levels = sum_DIU$Stage[order(as.numeric(sum_DIU$ID))])
+```
+
+```{r}
+pdf("sumDIU.pdf", width = 10, height = 10)
+# 绘制圆形图
+ggplot(sum_DIU, aes(x = ID, y = DIU, fill = Stage)) +
+  geom_col() +  # 使用 geom_col 绘制柱状图
+  coord_polar() +  # 转换坐标系为极坐标，形成圆形图
+  theme_void() +  # 移除多余的背景和标签
+  scale_fill_brewer(palette = "Blues") +
+  labs(title = "Differential Isoform Usage across Stages", fill = "Stage") 
+dev.off()
+```
+
+```{r}
+id_diu25dpavs20dpa <- get_dtu_ids(diu25dpavs20dpa)["DTU transcripts"]
+id_diu20dpavs15dpa <- get_dtu_ids(diu20dpavs15dpa)["DTU transcripts"]
+id_diu15dpavs10dpa <- get_dtu_ids(diu15dpavs10dpa)["DTU transcripts"]
+id_diu10dpavs5dpa <- get_dtu_ids(diu10dpavs5dpa)["DTU transcripts"]
+id_diu5dpavs3dpa <- get_dtu_ids(diu5dpavs3dpa)["DTU transcripts"]
+id_diu3dpavs1dpa <- get_dtu_ids(diu3dpavs1dpa)["DTU transcripts"]
+id_diu1dpavs0dpa <- get_dtu_ids(diu1dpavs0dpa)["DTU transcripts"]
+id_diu0dpavs_1dpa <- get_dtu_ids(diu0dpavs_1dpa)["DTU transcripts"]
+id_diu_1dpavs_3dpa <- get_dtu_ids(diu_1dpavs_3dpa)["DTU transcripts"]
+```
+
+```{r}
+true_diu25dpavs20dpa <- diu25dpavs20dpa$Transcripts[diu25dpavs20dpa$Transcripts$DTU == TRUE, ]
+
+```
+
+```{r}
+true_diu25dpavs20dpa <- diu25dpavs20dpa$Transcripts[diu25dpavs20dpa$Transcripts$DTU == TRUE, ]
+true_diu1dpavs0dpa <- diu1dpavs0dpa$Transcripts[diu1dpavs0dpa$Transcripts$DTU == TRUE, ]
+```
+
+```{r}
+true_diu1dpavs0dpa_df <- as.data.frame(true_diu1dpavs0dpa)
+```
+
+```{r}
+MSTRG.32941_df <- as.data.frame(diu$Transcripts["MSTRG.32941", ])
+```
+
+```{r}
+pdf("MSTRG.30080_diu.pdf", width = 10, height = 14)
+plot_gene(diu, "MSTRG.30080", style = "bycondition")
+dev.off()
+```
+
+```{r}
+#Distribution of proportion change.
+pdf("Gbdiu_distribution.pdf", width = 10, height = 12)
+plot_overview(diu, type="dprop")
+dev.off
+```
+
+```{r}
+#统计分布
+dtu_summary(diu)
+#Summary of isoform switching
+dtu_switch_summary(diu)
+#Summary of DTU plurality
+dtu_plurality_summary(diu)
+```
