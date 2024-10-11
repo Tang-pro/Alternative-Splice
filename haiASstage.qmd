@@ -1,0 +1,245 @@
+---
+title: "AS"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.\]
+
+```{r}
+library(tidyverse)
+library(ComplexUpset)
+library(ggplot2)
+```
+
+```{r}
+Gb_as <- read.table("Gbar_event.psi", check.names = F) 
+```
+
+```{r}
+
+modified_colnames <- gsub("^[^_]*_(.*)_[^_]*$", "\\1", colnames(Gb_as))
+
+```
+
+```{r}
+colnames(Gb_as) <- modified_colnames
+
+```
+
+```{r}
+Gb_as <- Gb_as %>% rownames_to_column(var = "ID")
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('ovule_-3dpa' = `ovule_-3dpa-1` > 0 & `ovule_-3dpa-2` > 0 & `ovule_-3dpa-3` > 0)
+
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('ovule_-1dpa' = `ovule_-1dpa-1` > 0 & `ovule_-1dpa-2` > 0 & `ovule_-1dpa-3` > 0)
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('ovule_0dpa' = `ovule_0dpa-1` > 0 & `ovule_0dpa-2` > 0 & `ovule_0dpa-3` > 0)
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('ovule_1dpa' = `ovule_1dpa-1` > 0 & `ovule_1dpa-2` > 0 & `ovule_1dpa-3` > 0)
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('ovule_3dpa' = `ovule_3dpa-1` > 0 & `ovule_3dpa-2` > 0 & `ovule_3dpa-3` > 0)
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('ovule_5dpa' = `ovule_5dpa-1` > 0 & `ovule_5dpa-2` > 0 & `ovule_5dpa-3` > 0)
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('fiber_10dpa' = `fiber_10dpa-1` > 0 & `fiber_10dpa-2` > 0 & `fiber_10dpa-3` > 0)
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('fiber_15dpa' = `fiber_15dpa-1` > 0 & `fiber_15dpa-2` > 0 & `fiber_15dpa-3` > 0)
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('fiber_20dpa' = `fiber_20dpa-1` > 0 & `fiber_20dpa-2` > 0 & `fiber_20dpa-3` > 0)
+```
+
+```{r}
+Gb_as <- Gb_as %>%
+  mutate('fiber_25dpa' = `fiber_25dpa-1` > 0 & `fiber_25dpa-2` > 0 & `fiber_25dpa-3` > 0)
+```
+
+```{r}
+Gbasus <- Gb_as[ , c(1,32:41)]
+```
+
+```{r}
+Gbasus <- na.omit(Gbasus)
+```
+
+修改列名
+
+```{r}
+colnames(Gbasus)[colnames(Gbasus) == "ovule_-3dpa"] <- "Ovule_3dpa"
+colnames(Gbasus)[colnames(Gbasus) == "ovule_-1dpa"] <- "Ovule_1dpa"
+colnames(Gbasus)[colnames(Gbasus) == "ovule_0dpa"] <- "Ovule0dpa"
+colnames(Gbasus)[colnames(Gbasus) == "ovule_1dpa"] <- "Ovule1dpa"
+colnames(Gbasus)[colnames(Gbasus) == "ovule_3dpa"] <- "Ovule3dpa"
+colnames(Gbasus)[colnames(Gbasus) == "ovule_5dpa"] <- "Ovule5dpa"
+colnames(Gbasus)[colnames(Gbasus) == "fiber_10dpa"] <- "Fiber10dpa"
+colnames(Gbasus)[colnames(Gbasus) == "fiber_15dpa"] <- "Fiber15dpa"
+colnames(Gbasus)[colnames(Gbasus) == "fiber_20dpa"] <- "Fiber20dpa"
+colnames(Gbasus)[colnames(Gbasus) == "fiber_25dpa"] <- "Fiber25dpa"
+
+```
+
+```{r}
+species <- colnames(Gbasus)[2:11]
+```
+
+```{r}
+RIGbasus <- Gbasus[grep("RI", Gbasus[,1]), ]
+```
+
+```{r}
+MXGbasus <- Gbasus[grep("MX", Gbasus[,1]), ] 
+```
+
+```{r}
+SEGbasus <- Gbasus[grep("SE", Gbasus[,1]), ] 
+```
+
+```{r}
+AFGbasus <- Gbasus[grep("AF", Gbasus[,1]), ] 
+```
+
+```{r}
+ALGbasus <- Gbasus[grep("AL", Gbasus[,1]), ] 
+```
+
+```{r}
+A5Gbasus <- Gbasus[grep("A5", Gbasus[,1]), ]
+```
+
+```{r}
+A3Gbasus <- Gbasus[grep("A3", Gbasus[,1]), ]
+```
+
+```{r}
+pdf("GbMXupset.pdf", width = 10, height = 8)
+upset(MXGbasus,
+      species,
+      name = "MX",
+      width_ratio = 0.1,
+      min_size = 1,
+      sort_sets=FALSE,
+      sort_intersections_by="degree") 
+dev.off()  
+```
+
+```{r}
+upset(AFGbasus,
+      species,
+      name = "AF",
+      width_ratio = 0.2,
+      min_size =20,
+      sort_sets=FALSE,
+      sort_intersections_by="degree")
+```
+
+```{r}
+upset(SEGbasus,
+      species,
+      name = "SE",
+      width_ratio = 0.2,
+      min_size = 30,
+      sort_sets=FALSE,
+      sort_intersections_by="degree")
+```
+
+```{r}
+upset(ALGbasus,
+      species,
+      name = "AL",
+      width_ratio = 0.2,
+      min_size = 10,
+      sort_sets=FALSE,
+      sort_intersections_by="degree")
+```
+
+```{r}
+upset(A5Gbasus,
+      species,
+      name = "A5",
+      width_ratio = 0.15,
+      min_size = 60,
+      sort_sets=FALSE,
+      sort_intersections_by="degree")
+```
+
+```{r}
+upset(A3Gbasus,
+      species,
+      name = "A3",
+      width_ratio = 0.15,
+      min_size = 90,
+      sort_sets=FALSE,
+      sort_intersections_by="degree")
+```
+
+```{r}
+pdf("GbRIupset.pdf", width = 24, height = 10)
+upset(RIGbasus,
+      species,
+      name = "RI",
+      width_ratio = 0.15,
+      min_size = 30,
+      sort_sets = FALSE,
+      sort_intersections_by = "degree",
+      base_annotations = list("Intersection size" = intersection_size(counts = FALSE, mapping = aes(fill = "bars_colour")) + scale_fill_manual(values = c(bars_colour = "#0a86ff"), guide = "none")),
+      queries = list(
+        upset_query(set = "Ovule_3dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule_1dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule0dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule1dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule3dpa", fill = "#6bb6ff"),
+        upset_query(set = "Ovule5dpa", fill = "#6bb6ff"),
+        upset_query(set = "Fiber10dpa", fill = "#1e90ff"),
+        upset_query(set = "Fiber15dpa", fill = "#1e90ff"),
+        upset_query(set = "Fiber20dpa", fill = "#006ad1"),
+        upset_query(set = "Fiber25dpa", fill = "#006ad1"),
+        upset_query(intersect = c("Fiber15dpa", "Fiber20dpa", "Fiber25dpa"), color = "#ff6b6c")
+      ))
+dev.off()
+
+```
+
+```{r}
+#-3dpa中特定的内含子保留事件
+RIGbasus_3dpa <- RIGbasus %>% filter(Ovule_3dpa == TRUE, 
+                                     Ovule_1dpa == FALSE,
+                                     Ovule0dpa == FALSE,
+                                     Ovule1dpa == FALSE,
+                                     Ovule3dpa == FALSE,
+                                     Ovule5dpa == FALSE,
+                                     Fiber10dpa == FALSE,
+                                     Fiber15dpa == FALSE,
+                                     Fiber20dpa == FALSE,
+                                     Fiber25dpa == FALSE
+  )
+```
